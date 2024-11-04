@@ -7,6 +7,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:provider/provider.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -20,6 +22,8 @@ class _HomeScreenState extends State<HomeScreen>
   String userName = '';
   String randomTip = '';
   String randomFoodSuggestion = '';
+
+ 
 
   // Animation Controllers
   late AnimationController _controller;
@@ -70,11 +74,22 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Future<void> fetchUserData() async {
-    String? phoneNumber =
-        Provider.of<GlobalState>(context, listen: false).phoneNumber;
+
+
+     SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? phoneNumber = prefs.getString('phone_number');
+    
+    print(phoneNumber);
+
+
+    Provider.of<GlobalState>(context, listen: false)
+        .setPhoneNumber(phoneNumber);
+
+
 
     final response = await http
         .get(Uri.parse('$SERVER_IP/get-data?phone_number=$phoneNumber'));
+       
 
     if (response.statusCode == 200) {
       setState(() {

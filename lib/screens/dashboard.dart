@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:heal_anemia/bluetooth_page/GlobalState.dart';
+import 'package:heal_anemia/bluetooth_page/HomePage.dart';
 import 'package:heal_anemia/global_state.dart';
 import 'package:heal_anemia/screens/pages/register_page.dart';
 import 'package:provider/provider.dart';
@@ -20,9 +22,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0;
 
   // List of widgets for each tab
-  static const List<Widget> _widgetOptions = <Widget>[
+  static List<Widget> _widgetOptions = <Widget>[
     HomeScreen(),
-    HPMeterScreen(),
+    HomePage(),
     ProfilePage(),
     NoticeScreen()
   ];
@@ -94,12 +96,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
+  Future<bool> _onWillPop() async {
+    return false; // Prevents back navigation
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dashboard'),
         backgroundColor: Colors.orangeAccent,
+        automaticallyImplyLeading: false, // Hide the back button
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -109,6 +116,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
+      
+      
+      
       body: _widgetOptions.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[

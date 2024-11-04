@@ -1,4 +1,4 @@
-var SERVER_IP = "http://192.168.1.15:3000";
+var SERVER_IP = "http://192.168.1.14:4000";
 var REGISTER_LOGO = "assets/images/reg_logo.png";
 var LOGIN_LOGO = "assets/images/login_logo.png";
 
