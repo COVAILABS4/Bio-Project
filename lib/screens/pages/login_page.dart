@@ -127,23 +127,16 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 // Centered and rounded logo
                 Container(
-                  width: 100,
-                  height: 100,
+                  width: 130,
+                  height: 130,
                   decoration: BoxDecoration(
-                    shape: BoxShape.circle,
+                    // shape: BoxShape.circle,
                     image: DecorationImage(
                       image: AssetImage(
                           LOGIN_LOGO), // Replace with the actual image path
-                      fit: BoxFit.cover,
+                      fit: BoxFit.fitHeight,
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset: Offset(0, 3),
-                      ),
-                    ],
+                    
                   ),
                 ),
                 const SizedBox(height: 30),

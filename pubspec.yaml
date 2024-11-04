@@ -40,6 +40,7 @@ dependencies:
   intl: ^0.19.0
   permission_handler: ^11.3.1
   flutter_bluetooth_serial: ^0.4.0
+  video_player: ^2.9.2
 
 dev_dependencies:
   flutter_test:
@@ -66,6 +67,8 @@ flutter:
   assets:
     - assets/images/reg_logo.png
     - assets/images/login_logo.png
+    - assets/images/logo.png
+    - assets/video/splash.mp4
     # - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

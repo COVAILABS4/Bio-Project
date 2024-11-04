@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart'; // Import Provider for state management
-import 'screens/dashboard.dart';
-import 'global_state.dart'; // Import the global state file
+import 'package:provider/provider.dart';
+import 'screens/splash_screen.dart';
+import 'global_state.dart';
 
 void main() {
   runApp(
     ChangeNotifierProvider(
-      create: (context) => GlobalState(), // Provide the GlobalState
+      create: (context) => GlobalState(),
       child: const MyApp(),
     ),
   );
@@ -21,16 +21,14 @@ class MyApp extends StatelessWidget {
       title: 'Dashboard',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch:
-            Colors.blue, // Set the primary color to blue or any color you like
-        scaffoldBackgroundColor: Colors.white, // Set background color to white
+        primarySwatch: Colors.blue,
+        scaffoldBackgroundColor: Colors.white,
         appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.white, // AppBar background color
-          foregroundColor: Colors.black, // AppBar text color
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
         ),
-        // You can add more theme customizations here if needed
       ),
-      home: SafeArea(child: DashboardScreen()),
+      home: SafeArea(child: SplashScreen()), // Set SplashScreen as the home screen
     );
   }
 }

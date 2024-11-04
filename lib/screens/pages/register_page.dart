@@ -79,22 +79,15 @@ class _RegisterPageState extends State<RegisterPage> {
               children: [
                 // Centered and rounded logo
                 Container(
-                  width: 100,
-                  height: 100,
+                  width: 130,
+                  height: 130,
                   decoration: BoxDecoration(
-                    shape: BoxShape.circle,
+                    // shape: BoxShape.circle,
                     image: DecorationImage(
                       image: AssetImage(REGISTER_LOGO),
-                      fit: BoxFit.cover,
+                      fit: BoxFit.fitHeight,
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset: Offset(0, 3),
-                      ),
-                    ],
+                   
                   ),
                 ),
                 const SizedBox(height: 30),

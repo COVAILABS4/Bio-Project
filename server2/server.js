@@ -163,6 +163,9 @@ app.post("/set-data", async (req, res) => {
 app.post("/save-hp", async (req, res) => {
   const { phone_number, hp_data } = req.body;
 
+  console.log(phone_number,hp_data);
+  
+
   if (!phone_number || !hp_data) {
     return res.status(400).json({ message: "Phone number and hp_data are required." });
   }
