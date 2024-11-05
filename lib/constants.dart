@@ -1,4 +1,6 @@
 var SERVER_IP = "https://bio-project.onrender.com";
+
+// var SERVER_IP = "http://192.168.1.14:4000";
 var REGISTER_LOGO = "assets/images/logo.png";
 var LOGIN_LOGO = "assets/images/logo.png";
 var VIDEO_PATH = "assets/video/splash.mp4";

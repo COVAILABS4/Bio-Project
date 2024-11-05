@@ -11,6 +11,8 @@ import 'Tabs/hp_screen.dart';
 import 'Tabs/profile_screen.dart';
 import 'Tabs/notice_screen.dart';
 
+import 'package:permission_handler/permission_handler.dart';
+
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
@@ -35,10 +37,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
+
+   Future<void> _requestPermissions() async {
+    await [Permission.nearbyWifiDevices,Permission.location, Permission.microphone, Permission.storage , Permission.bluetooth,Permission.bluetoothAdvertise,Permission.bluetoothConnect,Permission.bluetoothScan].request();
+  }
+
   @override
   void initState() {
     super.initState();
     _checkLoginStatus();
+    _requestPermissions();
   }
 
   // Check if the user is logged in
@@ -128,7 +136,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.battery_full),
-            label: 'HP Meter',
+            label: 'HB CALC',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),

@@ -107,6 +107,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
+        automaticallyImplyLeading: false, // Hide the back button
         actions: [
           IconButton(
             icon: Icon(isEditMode ? Icons.check : Icons.edit),

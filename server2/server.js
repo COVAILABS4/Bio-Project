@@ -6,8 +6,11 @@ const app = express();
 const port = 4000;
 
 // MongoDB connection
-const mongoURI = "mongodb+srv://covailabs4:KRISHtec5747@cluster0.ny4i2.mongodb.net/BMEdb";
-mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+const mongoURI =
+  "mongodb+srv://covailabs4:KRISHtec5747@cluster0.ny4i2.mongodb.net/BMEdb";
+
+mongoose
+  .connect(mongoURI)
   .then(() => console.log("MongoDB connected"))
   .catch((error) => console.error("MongoDB connection error:", error));
 
@@ -19,7 +22,7 @@ const hpDataSchema = new mongoose.Schema({
   time: String,
   date: String,
   hp_value: Number,
-  grade: String
+  grade: String,
 });
 
 const userSchema = new mongoose.Schema({
@@ -34,19 +37,47 @@ const userSchema = new mongoose.Schema({
     adhaar_number: String,
     height: String,
     weight: String,
-    diagnosis: [String]
+    diagnosis: [String],
   },
-  hp_data: [hpDataSchema]
+  hp_data: [hpDataSchema],
 });
 
 const User = mongoose.model("User", userSchema);
+
+// Endpoint to get user gender
+app.get("/get-gender", async (req, res) => {
+  let { phone_number } = req.query;
+  phone_number = "+" + phone_number.trim();
+
+  if (!phone_number) {
+    return res.status(400).json({ message: "Phone number is required." });
+  }
+
+  try {
+    const user = await User.findOne({ phone_number }, "userData.gender");
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const gender = user.userData.gender;
+    if (!gender) {
+      return res.status(404).json({ message: "Gender not set for this user." });
+    }
+
+    res.status(200).json({ gender });
+  } catch (error) {
+    res.status(500).json({ message: "Server error.", error });
+  }
+});
 
 // Registration Endpoint
 app.post("/register", async (req, res) => {
   const { phone_number, dob } = req.body;
 
   if (!phone_number || !dob) {
-    return res.status(400).json({ message: "Phone number and DOB are required." });
+    return res
+      .status(400)
+      .json({ message: "Phone number and DOB are required." });
   }
 
   try {
@@ -69,7 +100,9 @@ app.post("/login", async (req, res) => {
   const { phone_number, dob } = req.body;
 
   if (!phone_number || !dob) {
-    return res.status(400).json({ message: "Phone number and DOB are required." });
+    return res
+      .status(400)
+      .json({ message: "Phone number and DOB are required." });
   }
 
   try {
@@ -82,7 +115,9 @@ app.post("/login", async (req, res) => {
       return res.status(401).json({ message: "Invalid password." });
     }
 
-    res.status(200).json({ message: "Login successful.", newUser: user.newUser });
+    res
+      .status(200)
+      .json({ message: "Login successful.", newUser: user.newUser });
   } catch (error) {
     res.status(500).json({ message: "Server error.", error });
   }
@@ -93,7 +128,9 @@ app.post("/submit-survey", async (req, res) => {
   const { phone_number, userData } = req.body;
 
   if (!phone_number || !userData) {
-    return res.status(400).json({ message: "Phone number and survey data are required." });
+    return res
+      .status(400)
+      .json({ message: "Phone number and survey data are required." });
   }
 
   try {
@@ -139,7 +176,9 @@ app.post("/set-data", async (req, res) => {
   const { phone_number, userData } = req.body;
 
   if (!phone_number || !userData) {
-    return res.status(400).json({ message: "Phone number and user data are required." });
+    return res
+      .status(400)
+      .json({ message: "Phone number and user data are required." });
   }
 
   try {
@@ -163,11 +202,12 @@ app.post("/set-data", async (req, res) => {
 app.post("/save-hp", async (req, res) => {
   const { phone_number, hp_data } = req.body;
 
-  console.log(phone_number,hp_data);
-  
+  console.log(phone_number, hp_data);
 
   if (!phone_number || !hp_data) {
-    return res.status(400).json({ message: "Phone number and hp_data are required." });
+    return res
+      .status(400)
+      .json({ message: "Phone number and hp_data are required." });
   }
 
   try {

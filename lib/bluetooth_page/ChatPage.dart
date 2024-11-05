@@ -6,8 +6,10 @@ import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:heal_anemia/constants.dart';
 import 'package:heal_anemia/global_state.dart';
 import 'package:provider/provider.dart';
-import 'GlobalState.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+// import 'GlobalState.dart';
 import 'package:http/http.dart' as http;
+
 class ChatPage extends StatefulWidget {
   @override
   _ChatPageState createState() => _ChatPageState();
@@ -29,6 +31,8 @@ class _ChatPageState extends State<ChatPage> {
   bool isDisconnecting = false;
   bool isSendingData = false;
 
+  late String gender;
+
   // int age = 20; // Store the user's age
   String anemiaGrade = ''; // Store the anemia grade message
 
@@ -37,7 +41,42 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
+    getGender();
     WidgetsBinding.instance.addPostFrameCallback((_) => _initConnection());
+  }
+
+  Future<void> getGender() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? phoneNumber = prefs.getString('phone_number');
+
+    final url = Uri.parse('$SERVER_IP/get-gender?phone_number=$phoneNumber');
+
+    try {
+      final response = await http.get(url);
+      print("-------------------------");
+      print(response.statusCode);
+      print("-------------------------");
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        print(data);
+        print("-------------------------");
+
+        print(gender);
+      } else if (response.statusCode == 404) {
+        // Handle case where user is not found or gender is not set
+        final data = jsonDecode(response.body);
+        // return data['message'];
+      } else {
+        // Handle other server errors
+        print('Error: ${response.body}');
+        // return 'Server error: ${response.statusCode}';
+      }
+    } catch (e) {
+      // Handle network or other errors
+      print('Error: $e');
+      // return 'Failed to connect to server.';
+    }
   }
 
   void _initConnection() {
@@ -75,6 +114,7 @@ class _ChatPageState extends State<ChatPage> {
       appBar: AppBar(
         title: Text(serverName),
         backgroundColor: Colors.blueGrey,
+        automaticallyImplyLeading: false, // Hide the back button
       ),
       body: SafeArea(
         child: Column(
@@ -88,7 +128,9 @@ class _ChatPageState extends State<ChatPage> {
                   var message = messages[index];
                   bool isSentMessage = message.whom == clientID;
                   return Align(
-                    alignment: isSentMessage ? Alignment.centerRight : Alignment.centerLeft,
+                    alignment: isSentMessage
+                        ? Alignment.centerRight
+                        : Alignment.centerLeft,
                     child: Container(
                       margin: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
                       padding: EdgeInsets.all(10),
@@ -98,7 +140,8 @@ class _ChatPageState extends State<ChatPage> {
                             : Colors.blueAccent.withOpacity(0.5),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: isSentMessage ? Colors.green : Colors.blueAccent,
+                          color:
+                              isSentMessage ? Colors.green : Colors.blueAccent,
                           width: 2,
                         ),
                       ),
@@ -116,7 +159,8 @@ class _ChatPageState extends State<ChatPage> {
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Text(
                   "Sending data...",
-                  style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),
+                  style: TextStyle(
+                      fontStyle: FontStyle.italic, color: Colors.grey),
                 ),
               ),
             Padding(
@@ -126,50 +170,50 @@ class _ChatPageState extends State<ChatPage> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blueAccent,
                   padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
                 ),
                 child: Text(
                   "GET DATA",
-                  style: TextStyle(fontSize: 18 , color: Colors.white),
+                  style: TextStyle(fontSize: 18, color: Colors.white),
                 ),
               ),
             ),
             SizedBox(height: 16),
             // Result Box
             if (anemiaGrade.isNotEmpty)
-            Container(
-              padding: EdgeInsets.all(16),
-              margin: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.lightBlueAccent.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.blueAccent, width: 2),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Haemoglobin (Hb) : ${hp_value} g/dL"),
-                  Text(
-                    "Anemia Grade Result",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blueAccent,
+              Container(
+                padding: EdgeInsets.all(16),
+                margin: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.lightBlueAccent.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.blueAccent, width: 2),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Haemoglobin (Hb) : ${hp_value} g/dL"),
+                    Text(
+                      "Anemia Grade Result",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blueAccent,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    anemiaGrade,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                    SizedBox(height: 8),
+                    Text(
+                      anemiaGrade,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
                     ),
-                  ),
-                  
-                ],
+                  ],
+                ),
               ),
-            ),
 
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -179,13 +223,12 @@ class _ChatPageState extends State<ChatPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.greenAccent,
                     padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
                   ),
                   child: Text(
                     "SAVE",
-                    style: TextStyle(fontSize: 18,color: Colors.white)
-                    
-                    ,
+                    style: TextStyle(fontSize: 18, color: Colors.white),
 
                     // selectionColor: Colors.white,
                   ),
@@ -195,11 +238,12 @@ class _ChatPageState extends State<ChatPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.redAccent,
                     padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
                   ),
                   child: Text(
                     "CLEAR",
-                   style: TextStyle(fontSize: 18 , color: Colors.white),
+                    style: TextStyle(fontSize: 18, color: Colors.white),
                   ),
                 ),
               ],
@@ -217,30 +261,41 @@ class _ChatPageState extends State<ChatPage> {
       setState(() {
         messages.add(_Message(1, receivedText));
         anemiaGrade = _getAnemiaGrade(receivedText);
+
+        print(anemiaGrade);
       });
     }
   }
 
   String _getAnemiaGrade(String receivedText) {
-
-    print(receivedText);
+    print("Received Text: $receivedText");
     double hemoglobinLevel = double.tryParse(receivedText) ?? 0.0;
-    print(hemoglobinLevel);
+    print("Hemoglobin Level: $hemoglobinLevel");
 
-    hp_value = hemoglobinLevel;
-    
     if (hemoglobinLevel < 6.5) {
       return "Life-threatening Anemia: less than 6.5 g/dL";
-    } else if (hemoglobinLevel >= 6.5 && hemoglobinLevel < 7.9) {
+    } else if (hemoglobinLevel >= 6.5 && hemoglobinLevel <= 7.9) {
       return "Severe Anemia: 6.5 to 7.9 g/dL";
     } else if (hemoglobinLevel >= 8.0 && hemoglobinLevel < 10.0) {
       return "Moderate Anemia: 8.0 to 10.0 g/dL";
-    } else if (hemoglobinLevel >= 10.0 && hemoglobinLevel < (14.0)) {
-      return "Mild Anemia: 10.0 g/dL to lower limit of normal";
-    } else if ((hemoglobinLevel >= 12.0 && hemoglobinLevel <= 16.0 )) {
-      return "Normal: ${"12 - 16 g/dL"}";
+    } else if (gender.toLowerCase() == "female" &&
+        10 <= hemoglobinLevel &&
+        hemoglobinLevel <= 12) {
+      return "Mild : 10.0 g/dL to 12.0 g/dL for women";
+    } else if (gender.toLowerCase() == "male" &&
+        10 <= hemoglobinLevel &&
+        hemoglobinLevel < 14) {
+      return "Mild : 10.0 g/dL to 14.0 g/dL for men";
+    } else if (gender.toLowerCase() == "female" &&
+        12 <= hemoglobinLevel &&
+        hemoglobinLevel <= 16) {
+      return "Normal : 12.0 g/dL to 16.0 g/dL for women";
+    } else if (gender.toLowerCase() == "male" &&
+        14 <= hemoglobinLevel &&
+        hemoglobinLevel <= 18) {
+      return "Normal : 14.0 g/dL to 18.0 g/dL for women";
     } else {
-      return "Invalid Hemoglobin Level";
+      return "Above 18";
     }
   }
 
@@ -263,68 +318,70 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-  
-void _saveData() async {
-  try {
-    // Prepare the JSON payload
-    final String ip = SERVER_IP; // API endpoint
-    
-    // Get current date and time
-    final now = DateTime.now();
-    
-    // Format time to HH:MM
-    String formattedTime = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
-    
-    // Format date to DD/MM/YYYY
-    String formattedDate = '${now.day.toString().padLeft(2, '0')}/${now.month.toString().padLeft(2, '0')}/${now.year}';
+  void _saveData() async {
+    try {
+      // Prepare the JSON payload
+      final String ip = '$SERVER_IP/save-hp'; // API endpoint
 
-    // Prepare hp_data
-    final Map<String, dynamic> hpData = {
-      'time': formattedTime, // Only HH:MM format
-      'date': formattedDate, // DD/MM/YYYY format
-      'hp_value': hp_value, // double.tryParse(anemiaGrade.split(' ')[0]) ?? 0.0, // Extracting hemoglobin value
-      'grade': anemiaGrade,
-    };
+      // Get current date and time
+      final now = DateTime.now();
 
+      // Format time to HH:MM
+      String formattedTime =
+          '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
 
-     String? phoneNumber =
-        Provider.of<GlobalState>(context, listen: false).phoneNumber;
+      // Format date to DD/MM/YYYY
+      String formattedDate =
+          '${now.day.toString().padLeft(2, '0')}/${now.month.toString().padLeft(2, '0')}/${now.year}';
 
+      // Prepare hp_data
+      final Map<String, dynamic> hpData = {
+        'time': formattedTime, // Only HH:MM format
+        'date': formattedDate, // DD/MM/YYYY format
+        'hp_value':
+            hp_value, // double.tryParse(anemiaGrade.split(' ')[0]) ?? 0.0, // Extracting hemoglobin value
+        'grade': anemiaGrade,
+      };
 
-    final Map<String, dynamic> postData = {
-      'phone_number': phoneNumber,
-      'hp_data': hpData, // Send hp_data directly
-    };
+      String? phoneNumber =
+          Provider.of<GlobalState>(context, listen: false).phoneNumber;
 
-    // Make the POST request
-    final response = await http.post(
-      Uri.parse(ip),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode(postData),
-    );
+      // print(phoneNumber);
 
-    // Check the response
-    if (response.statusCode == 200) {
-      // Handle success
-      print('Data saved successfully: ${response.body}');
-      // Optionally show a success message to the user
+      final Map<String, dynamic> postData = {
+        'phone_number': phoneNumber,
+        'hp_data': hpData, // Send hp_data directly
+      };
+
+      // Make the POST request
+      final response = await http.post(
+        Uri.parse(ip),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(postData),
+      );
+
+      // Check the response
+      if (response.statusCode == 200) {
+        // Handle success
+        print('Data saved successfully: ${response.body}');
+        // Optionally show a success message to the user
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Data saved successfully!'),
+        ));
+      } else {
+        // Handle error
+        print('Failed to save data: ${response.statusCode}');
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Failed to save data!'),
+        ));
+      }
+    } catch (e) {
+      print("Error while saving data: $e");
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Data saved successfully!'),
-      ));
-    } else {
-      // Handle error
-      print('Failed to save data: ${response.statusCode}');
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Failed to save data!'),
+        content: Text('Error while saving data!'),
       ));
     }
-  } catch (e) {
-    print("Error while saving data: $e");
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('Error while saving data!'),
-    ));
   }
-}
 
   void _clearData() {
     setState(() {
