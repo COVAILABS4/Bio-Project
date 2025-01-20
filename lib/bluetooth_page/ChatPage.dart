@@ -49,33 +49,23 @@ class _ChatPageState extends State<ChatPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? phoneNumber = prefs.getString('phone_number');
 
+    print("-=-=-=$phoneNumber");
+
     final url = Uri.parse('$SERVER_IP/get-gender?phone_number=$phoneNumber');
 
     try {
       final response = await http.get(url);
-      print("-------------------------");
-      print(response.statusCode);
-      print("-------------------------");
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-
-        print(data);
-        print("-------------------------");
-
-        print(gender);
-      } else if (response.statusCode == 404) {
-        // Handle case where user is not found or gender is not set
-        final data = jsonDecode(response.body);
-        // return data['message'];
+        setState(() {
+          gender = data['gender']; // Ensure gender is set properly
+        });
+        print("Gender: $gender");
       } else {
-        // Handle other server errors
-        print('Error: ${response.body}');
-        // return 'Server error: ${response.statusCode}';
+        print('Error: Unable to fetch gender.');
       }
     } catch (e) {
-      // Handle network or other errors
       print('Error: $e');
-      // return 'Failed to connect to server.';
     }
   }
 
@@ -270,7 +260,11 @@ class _ChatPageState extends State<ChatPage> {
   String _getAnemiaGrade(String receivedText) {
     print("Received Text: $receivedText");
     double hemoglobinLevel = double.tryParse(receivedText) ?? 0.0;
-    print("Hemoglobin Level: $hemoglobinLevel");
+
+    setState(() {
+      hp_value = hemoglobinLevel;
+    });
+    // print("Hemoglobin Level: $receivedText");
 
     if (hemoglobinLevel < 6.5) {
       return "Life-threatening Anemia: less than 6.5 g/dL";
